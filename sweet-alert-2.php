@@ -3,7 +3,7 @@
 session_start();
 
 // ISSET = VERIFICA SE AS VARIÁVEIS FORAM CRIADAS
-if (isset($_SESSION["tipo"]) && isset($_SESSION["msg"])) {
+if (isset($_SESSION["title"]) && isset($_SESSION["tipo"]) && isset($_SESSION["msg"])) {
     echo "
     <script>
     $(function() {
@@ -15,8 +15,9 @@ if (isset($_SESSION["tipo"]) && isset($_SESSION["msg"])) {
         });
         
         Toast.fire({
-            icon: 'info',
-            title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+            icon: '" . $_SESSION["tipo"] . "',
+            title: '" . $_SESSION["title"] . "',
+            text: '" . $_SESSION["msg"] . "'
         });
         
     });

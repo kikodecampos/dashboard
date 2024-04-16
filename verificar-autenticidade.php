@@ -7,7 +7,7 @@ if ($_SESSION["autenticado"] != true) {
     // DESTRUIR QUALQUER SESSÃO EXISTENTE
     session_destroy();
 
-    header("Location: ../tela_login.php");
+    header("Location: ./login.php");
     exit;
 } else {
 
@@ -22,7 +22,7 @@ if ($_SESSION["autenticado"] != true) {
         echo "
         <script>
             alert('Tempo de sessão esgotado!');
-            window.location='../tela_login.php';
+            window.location='./login.php';
         </script>
         ";
         exit;
