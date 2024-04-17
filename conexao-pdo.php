@@ -5,7 +5,7 @@ define('password', '');
 
 try {
     $conn = new PDO('mysql: host=localhost; dbname=ordem_servico', username, password);
-}catch(PDOException $e){
-    echo "Error: ". $e -> getMessage();
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
     exit;
 }

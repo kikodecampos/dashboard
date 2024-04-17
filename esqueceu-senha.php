@@ -44,7 +44,7 @@
                 </form>
 
                 <p class="mb-1">
-                    <a href="login.php">Fazer login</a>
+                    <a href="./login.php">Fazer login</a>
                 </p>
             </div>
             <!-- /.card-body -->
