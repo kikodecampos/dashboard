@@ -5,10 +5,10 @@
       <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
     </li>
     <li class="nav-item d-none d-sm-inline-block">
-      <a href="./index.php" class="nav-link">Home</a>
+      <a href="<?php echo caminhoURL; ?>/index.php" class="nav-link">Home</a>
     </li>
     <li class="nav-item d-none d-sm-inline-block">
-      <a href="./contato.php" class="nav-link">Contato</a>
+      <a href="<?php echo caminhoURL; ?>/contato.php" class="nav-link">Contato</a>
     </li>
   </ul>
 
