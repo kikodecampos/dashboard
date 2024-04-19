@@ -14,7 +14,7 @@ if ($_SESSION["autenticado"] != true) {
     exit;
 } else {
 
-    $tempo_limite = 300; // SEGUNDOS
+    $tempo_limite = 3000000000; // SEGUNDOS
     $tempo_atual = time();
 
     // VERIFICAR TEMPO INATIVO DO USUÁRIO
