@@ -50,7 +50,7 @@ include('../conexao-pdo.php');
             <div class="col">
               <div class="card card-primary card-outline">
                 <div class="card-header">
-                  <h3 class="card-title">Lista de serviços</h3>
+                  <h3 class="card-title">Lista de O.S.</h3>
                   <a href="./form.php" class="btn btn-sm btn-primary float-right rounded-circle">
                     <i class="bi bi-plus"></i>
                   </a>
@@ -60,7 +60,10 @@ include('../conexao-pdo.php');
                     <thead>
                       <tr>
                         <th>CÓD</th>
-                        <th>SERVIÇO</th>
+                        <th>CLIENTE</th>
+                        <th>DATA INICIAL</th>
+                        <th>DATA FINAL</th>
+                        <th>R$ TOTAL</th>
                         <th>OPÇÕES</th>
                       </tr>
                     </thead>
@@ -68,39 +71,55 @@ include('../conexao-pdo.php');
                       <?php
                       // MONTAR A SINTAXE SQL PARA ENVIAR AO MYSQL
                       $sql = "
-                      SELECT pk_servico, servico
-                      FROM servicos
-                      ORDER BY servico
+                      SELECT 
+                        pk_ordem_servico, 
+                        DATE_FORMAT(data_inicio, '%d/%m/%Y') data_inicio, 
+                        DATE_FORMAT(data_fim, '%d/%m/%Y') data_fim, 
+                        FORMAT(valor_total,2,'de_DE') valor_total,
+                      nome
+                      FROM ordens_servicos
+                      JOIN clientes ON fk_cliente = pk_cliente
+                      ORDER BY data_inicio DESC
                       ";
-                      // PREPARA A SINTAXE NA CONEXÃO
-                      $stmt = $conn->prepare($sql);
-                      // EXECUTA O COMANDO NO MYSQL
-                      $stmt->execute();
-                      // RECEBE AS INFORMAÇÕES VINDAS DO MYSQL
-                      $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-                      // LAÇO DE REPETIÇÃO PARA PRINTAR INFORMAÇÕES
-                      foreach ($dados as $row) {
-                        echo '
-                        <tr>
-                          <td>' . $row->pk_servico . '</td>
-                          <td>' . $row->servico . '</td>
-                          <td>
-                            <div class="btn-group">
-                              <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                <i class="bi bi-tools"></i>
-                              </button>
-                              <div class="dropdown-menu" role="menu">
-                                <a class="dropdown-item" href="./form.php?ref=' . base64_encode($row->pk_servico) . '">
-                                  <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                <a class="dropdown-item" href="./remover.php?ref=' . base64_encode($row->pk_servico) . '">
-                                  <i class="bi bi-trash"></i> Remover
-                                </a>
+
+                      try {
+                        // PREPARA A SINTAXE NA CONEXÃO
+                        $stmt = $conn->prepare($sql);
+                        // EXECUTA O COMANDO NO MYSQL
+                        $stmt->execute();
+                        // RECEBE AS INFORMAÇÕES VINDAS DO MYSQL
+                        $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
+                        // LAÇO DE REPETIÇÃO PARA PRINTAR INFORMAÇÕES
+                        foreach ($dados as $row) {
+                          echo '
+                          <tr>
+                            <td>' . $row->pk_ordem_servico . '</td>
+                            <td>' . $row->nome . '</td>
+                            <td>' . $row->data_inicio . '</td>
+                            <td>' . $row->data_fim . '</td>
+                            <td>' . $row->valor_total . '</td>
+                            <td>
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                  <i class="bi bi-tools"></i>
+                                </button>
+                                <div class="dropdown-menu" role="menu">
+                                  <a class="dropdown-item" href="./form.php?ref=' . base64_encode($row->pk_ordem_servico) . '">
+                                    <i class="bi bi-pencil"></i> Editar
+                                  </a>
+                                  <a class="dropdown-item" href="./remover.php?ref=' . base64_encode($row->pk_ordem_servico) . '">
+                                    <i class="bi bi-trash"></i> Remover
+                                  </a>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                        ';
+                            </td>
+                          </tr>
+                          ';
+                        }
+                      } catch (Exception $ex) {
+                        $_SESSION["tipo"] = "error";
+                        $_SESSION["title"] = "Ops!";
+                        $_SESSION["msg"] = $ex->getMessage();
                       }
                       ?>
                     </tbody>

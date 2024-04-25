@@ -3,27 +3,33 @@ include('../verificar-autenticidade.php');
 include('../conexao-pdo.php');
 
 // VERIFICA SE NÃO ESTÁ VINDO ID NA URL
-if(empty($_GET["ref"])) {
-    $pk_servico = "";
-    $servico = "";
+if (empty($_GET["ref"])) {
+    $pk_cliente = "";
+    $nome = "";
+    $cpf = "";
+    $whatsapp = "";
+    $email = "";
 } else {
-    $pk_servico = base64_decode(trim($_GET["ref"]));
+    $pk_cliente = base64_decode(trim($_GET["ref"]));
     // MONTA A SINTAXE SQL PARA ENVIAR AO MYSQL
     $sql = "
-    SELECT pk_servico, servico
-    FROM servicos
-    WHERE pk_servico = :pk_servico
+    SELECT pk_cliente, nome, cpf, whatsapp, email
+    FROM clientes
+    WHERE pk_cliente = :pk_cliente
     ";
     // PREPARA A SINTAXE
     $stmt = $conn->prepare($sql);
     // SUBSTITUI A STRING :PK_SERVICO PELA VARIÁVEL $PK_SERVICO
-    $stmt->bindParam(':pk_servico',$pk_servico);
+    $stmt->bindParam(':pk_cliente', $pk_cliente);
     // EXECUTA A SINTAXE FINAL NO MYSQL
     $stmt->execute();
     // VERIFICAR SE ENCONTROU ALGUM REGISTRO NO BANCO DE DADOS
-    if($stmt->rowCount() > 0) {
+    if ($stmt->rowCount() > 0) {
         $dado = $stmt->fetch(PDO::FETCH_OBJ);
-        $servico = $dado->servico;
+        $nome = $dado->nome;
+        $cpf = $dado->cpf;
+        $whatsapp = $dado->whatsapp;
+        $email = $dado->email;
     } else {
         $_SESSION["tipo"] = 'error';
         $_SESSION["title"] = 'Ops!';
@@ -80,17 +86,31 @@ if(empty($_GET["ref"])) {
                             <form method="post" action="salvar.php">
                                 <div class="card card-primary card-outline">
                                     <div class="card-header">
-                                        <h3 class="card-title">Lista de serviços</h3>
+                                        <h3 class="card-title">Lista de clientes</h3>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <label for="pk_servico" class="form-label">Cód</label>
-                                                <input readonly type="text" class="form-control" id="pk_servico" name="pk_servico" value="<?php echo $pk_servico; ?>">
+                                                <label for="pk_cliente" class="form-label">Cód</label>
+                                                <input readonly type="text" class="form-control" id="pk_cliente" name="pk_cliente" value="<?php echo $pk_cliente; ?>">
                                             </div>
                                             <div class="col">
-                                                <label for="servico" class="form-label">Serviço</label>
-                                                <input required type="text" class="form-control" id="servico" name="servico" value="<?php echo $servico; ?>">
+                                                <label for="nome" class="form-label">Nome</label>
+                                                <input required type="text" class="form-control" id="nome" name="nome" value="<?php echo $nome; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md">
+                                                <label for="cpf" class="form-label">CPF</label>
+                                                <input required type="text" class="form-control" id="cpf" name="cpf" value="<?php echo $cpf; ?>">
+                                            </div>
+                                            <div class="col-md">
+                                                <label for="whatsapp" class="form-label">Whatsapp</label>
+                                                <input type="text" class="form-control" id="whatsapp" name="whatsapp" value="<?php echo $whatsapp; ?>">
+                                            </div>
+                                            <div class="col-md">
+                                                <label for="email" class="form-label">E-mail</label>
+                                                <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>">
                                             </div>
                                         </div>
                                     </div>

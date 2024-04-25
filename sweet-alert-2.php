@@ -24,3 +24,7 @@ if (isset($_SESSION["title"]) && isset($_SESSION["tipo"]) && isset($_SESSION["ms
     </script>
     ";
 }
+
+unset($_SESSION["tipo"]);
+unset($_SESSION["title"]);
+unset($_SESSION["msg"]);

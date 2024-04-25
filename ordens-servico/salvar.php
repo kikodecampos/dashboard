@@ -6,7 +6,7 @@ include("../conexao-pdo.php");
 // VERIFICA SE ESTÁ VINDO INFORMAÇÕES VIA POST
 if ($_POST) {
     // VERIFICA CAMPOS OBRIGATÓRIOS
-    if (empty($_POST["servico"])) {
+    if (empty($_POST["nome"]) || empty($_POST["cpf"] || strlen($_POST["cpf"] != 14))) {
         $_SESSION["tipo"] = 'warning';
         $_SESSION["title"] = 'Ops!';
         $_SESSION["msg"] = 'Por favor, preencha os campos obrigatórios.';
@@ -14,26 +14,38 @@ if ($_POST) {
         exit;
     } else {
         // RECUPERA INFORMAÇÕES PREENCHIDAS PELO USUÁRIO
-        $pk_servico = trim($_POST["pk_servico"]);
-        $servico = trim($_POST["servico"]);
+        $pk_cliente = trim($_POST["pk_cliente"]);
+        $nome = trim($_POST["nome"]);
+        $cpf = trim($_POST["cpf"]);
+        $whatsapp = trim($_POST["whatsapp"]);
+        $email = trim($_POST["email"]);
 
         try {
-            if (empty($pk_servico)) {
+            if (empty($pk_cliente)) {
                 $sql = "
-                INSERT INTO servicos (servico) VALUES
-                (:servico)
+                INSERT INTO clientes (nome, cpf, whatsapp, email) VALUES
+                (:nome, :cpf, :whatsapp, :email)
                 ";
                 $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':servico', $servico);
+                $stmt->bindParam(':nome', $nome);
+                $stmt->bindParam(':cpf', $cpf);
+                $stmt->bindParam(':whatsapp', $whatsapp);
+                $stmt->bindParam(':email', $email);
             } else {
                 $sql = "
-                UPDATE servicos SET
-                servico = :servico
-                WHERE pk_servico = :pk_servico
+                UPDATE clientes SET
+                nome = :nome,
+                cpf = :cpf,
+                whatsapp = :whatsapp,
+                email = :email
+                WHERE pk_cliente = :pk_cliente
                 ";
                 $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':pk_servico', $pk_servico);
-                $stmt->bindParam(':servico', $servico);
+                $stmt->bindParam(':pk_cliente', $pk_cliente);
+                $stmt->bindParam(':nome', $nome);
+                $stmt->bindParam(':cpf', $cpf);
+                $stmt->bindParam(':whatsapp', $whatsapp);
+                $stmt->bindParam(':email', $email);
             }
             // EXECUTA INSERT OU UPDATE ACIMA
             $stmt->execute();

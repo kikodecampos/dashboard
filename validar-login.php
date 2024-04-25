@@ -19,13 +19,14 @@ if ($_POST) {
 
         include('./conexao-pdo.php');
 
+        $sql = "
+        SELECT pk_usuario, nome 
+        FROM usuarios 
+        WHERE email LIKE :email 
+        AND senha LIKE :senha
+        ";
         // stmt = statement 
-        $stmt = $conn->prepare("
-            SELECT pk_usuario, nome 
-            FROM usuarios 
-            WHERE email LIKE :email 
-            AND senha LIKE :senha
-        ");
+        $stmt = $conn->prepare($sql);
 
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':senha', $senha);
