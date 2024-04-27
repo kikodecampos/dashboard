@@ -2,45 +2,74 @@
 include('../verificar-autenticidade.php');
 include('../conexao-pdo.php');
 
+$pagina_ativa = 'ordens-servico';
+
+// INICIA CONSTRUÇÃO DO SELECT DOS SERVIÇOS
+$sql = "
+SELECT pk_servico, servico
+FROM servicos
+ORDER BY servico
+";
+
+try {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    $options = '<option value="">--Selecione--</option>';
+
+    foreach ($dados as $key => $row) {
+        $options .= '<option value="' . $row->pk_servico . '">' . $row->servico . '</option>';
+    }
+} catch (Exception $ex) {
+    $_SESSION["tipo"] = "error";
+    $_SESSION["title"] = "Ops!";
+    $_SESSION["msg"] = $ex->getMessage();
+
+    header("Location: ./");
+    exit;
+}
+
 // VERIFICA SE NÃO ESTÁ VINDO ID NA URL
 if (empty($_GET["ref"])) {
-    $pk_ordem_servico = "";
-    $cpf = "";
-    $nome = "";
-    $data_ordem_servico = "";
-    $data_inicio = "";
-    $data_fim = "";
+$pk_ordem_servico = "";
+$cpf = "";
+$nome = "";
+$data_ordem_servico = "";
+$data_inicio = "";
+$data_fim = "";
 } else {
-    $pk_ordem_servico = base64_decode(trim($_GET["ref"]));
-    // MONTA A SINTAXE SQL PARA ENVIAR AO MYSQL
-    $sql = "
-    SELECT pk_ordem_servico, data_ordem_servico , data_inicio, data_fim,
-    cpf, nome
-    FROM ordens_servicos
-    JOIN clientes ON pk_cliente = fk_cliente
-    WHERE pk_ordem_servico = :pk_ordem_servico
-    ";
-    // PREPARA A SINTAXE
-    $stmt = $conn->prepare($sql);
-    // SUBSTITUI A STRING :PK_SERVICO PELA VARIÁVEL $PK_SERVICO
-    $stmt->bindParam(':pk_ordem_servico', $pk_ordem_servico);
-    // EXECUTA A SINTAXE FINAL NO MYSQL
-    $stmt->execute();
-    // VERIFICAR SE ENCONTROU ALGUM REGISTRO NO BANCO DE DADOS
-    if ($stmt->rowCount() > 0) {
-        $dado = $stmt->fetch(PDO::FETCH_OBJ);
-        $data_ordem_servico = $dado->data_ordem_servico;
-        $data_inicio = $dado->data_inicio;
-        $data_fim = $dado->data_fim;
-        $cpf = $dado->cpf;
-        $nome = $dado->nome;
-    } else {
-        $_SESSION["tipo"] = 'error';
-        $_SESSION["title"] = 'Ops!';
-        $_SESSION["msg"] = 'Registro não encontrado.';
-        header("Location: ./");
-        exit;
-    }
+$pk_ordem_servico = base64_decode(trim($_GET["ref"]));
+// MONTA A SINTAXE SQL PARA ENVIAR AO MYSQL
+$sql = "
+SELECT pk_ordem_servico, data_ordem_servico , data_inicio, data_fim,
+cpf, nome
+FROM ordens_servicos
+JOIN clientes ON pk_cliente = fk_cliente
+WHERE pk_ordem_servico = :pk_ordem_servico
+";
+// PREPARA A SINTAXE
+$stmt = $conn->prepare($sql);
+// SUBSTITUI A STRING :PK_SERVICO PELA VARIÁVEL $PK_SERVICO
+$stmt->bindParam(':pk_ordem_servico', $pk_ordem_servico);
+// EXECUTA A SINTAXE FINAL NO MYSQL
+$stmt->execute();
+// VERIFICAR SE ENCONTROU ALGUM REGISTRO NO BANCO DE DADOS
+if ($stmt->rowCount() > 0) {
+$dado = $stmt->fetch(PDO::FETCH_OBJ);
+$data_ordem_servico = $dado->data_ordem_servico;
+$data_inicio = $dado->data_inicio;
+$data_fim = $dado->data_fim;
+$cpf = $dado->cpf;
+$nome = $dado->nome;
+} else {
+$_SESSION["tipo"] = 'error';
+$_SESSION["title"] = 'Ops!';
+$_SESSION["msg"] = 'Registro não encontrado.';
+header("Location: ./");
+exit;
+}
 }
 
 ?>
@@ -126,7 +155,7 @@ if (empty($_GET["ref"])) {
                                                 <div class="card card-warning card-outline">
                                                     <div class="card-header">
                                                         <h3 class="card-title">Lista de servicos</h3>
-                                                        <button type="button" class="btn btn-sm btn-primary float-right rounded-circle" onclick="AddRow()">
+                                                        <button type="button" class="btn btn-sm btn-primary float-right rounded-circle" id="btn-add">
                                                             <i class="bi bi-plus"></i>
                                                         </button>
                                                     </div>
@@ -143,32 +172,7 @@ if (empty($_GET["ref"])) {
                                                                 <tr>
                                                                     <td>
                                                                         <select class="form-control">
-                                                                            <option value="">--Selecione--</option>
-                                                                            <?php
-                                                                            $sql = "
-                                                                            SELECT pk_servico, servico
-                                                                            FROM servicos
-                                                                            ORDER BY servico
-                                                                            ";
-
-                                                                            try {
-                                                                                $stmt = $conn->prepare($sql);
-                                                                                $stmt->execute();
-
-                                                                                $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-                                                                                foreach ($dados as $key => $row) {
-                                                                                    echo '<option value="' . $row->pk_servico . '">' . $row->servico . '</option>';
-                                                                                }
-                                                                            } catch (Exception $ex) {
-                                                                                $_SESSION["tipo"] = "error";
-                                                                                $_SESSION["title"] = "Ops!";
-                                                                                $_SESSION["msg"] = $ex->getMessage();
-
-                                                                                header("Location: ./");
-                                                                                exit;
-                                                                            }
-                                                                            ?>
+                                                                            <?php echo $options; ?>
                                                                         </select>
                                                                     </td>
                                                                     <td>
@@ -246,7 +250,7 @@ if (empty($_GET["ref"])) {
     <script>
         $(function() {
 
-            $("#cpf").blur(function() {
+            $("#cpf").change(function() {
                 // LIMPAR INPUT DE NOME
                 $("#nome").val("");
                 // FAZ A REQUISIÇÃO PARA O ARQUIVO "CONSULTAR_CPF.PHP"
@@ -255,11 +259,14 @@ if (empty($_GET["ref"])) {
                         cpf: $("#cpf").val()
                     },
                     function(data) {
-                        console.log(data)
+                        if (data['success'] == true) {
+                            $("#nome").val(data['dado']['nome']);
+                        } else {
+                            alert(data['dado']);
+                            $("#cpf").val("")
+                        }
                     }
                 )
-
-
             });
 
             $("#theme-mode").click(function() {
@@ -278,22 +285,21 @@ if (empty($_GET["ref"])) {
                 }
             });
 
-            AddRow = function() {
+            $("#btn-add").click(function() {
                 var newRow = $("<tr>");
                 var cols = "";
                 cols += '<td>';
-                cols += '<select class="form-control" name="colaborador[]">';
-                cols += '<option value=""> -- Selecione -- </option>';
+                cols += '<select class="form-control" name="">';
+                cols += '<?php echo $options; ?>';
                 cols += '</select>';
                 cols += '</td>';
-                cols += '<td><input type="number" class="form-control" name="qtdeHora[]"></td>';
+                cols += '<td><input type="number" class="form-control" name=""></td>';
                 cols += '<td>';
                 cols += '<button class="btn btn-danger btn-sm" onclick="RemoveRow(this)" type="button"><i class="fas fa-trash"></i></button>';
                 cols += '</td>';
                 newRow.append(cols);
                 $("#tabela_servicos").append(newRow);
-                return false;
-            };
+            });
 
             RemoveRow = function(item) {
                 var tr = $(item).closest('tr');
@@ -302,7 +308,6 @@ if (empty($_GET["ref"])) {
                 });
                 return false;
             }
-
         })
     </script>
 </body>

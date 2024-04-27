@@ -2,6 +2,8 @@
 include('../verificar-autenticidade.php');
 include('../conexao-pdo.php');
 
+$pagina_ativa = 'servicos';
+
 // VERIFICA SE NÃO ESTÁ VINDO ID NA URL
 if(empty($_GET["ref"])) {
     $pk_servico = "";
