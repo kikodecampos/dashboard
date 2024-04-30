@@ -33,43 +33,43 @@ try {
 
 // VERIFICA SE NÃO ESTÁ VINDO ID NA URL
 if (empty($_GET["ref"])) {
-$pk_ordem_servico = "";
-$cpf = "";
-$nome = "";
-$data_ordem_servico = "";
-$data_inicio = "";
-$data_fim = "";
+    $pk_ordem_servico = "";
+    $cpf = "";
+    $nome = "";
+    $data_ordem_servico = "";
+    $data_inicio = "";
+    $data_fim = "";
 } else {
-$pk_ordem_servico = base64_decode(trim($_GET["ref"]));
-// MONTA A SINTAXE SQL PARA ENVIAR AO MYSQL
-$sql = "
+    $pk_ordem_servico = base64_decode(trim($_GET["ref"]));
+    // MONTA A SINTAXE SQL PARA ENVIAR AO MYSQL
+    $sql = "
 SELECT pk_ordem_servico, data_ordem_servico , data_inicio, data_fim,
 cpf, nome
 FROM ordens_servicos
 JOIN clientes ON pk_cliente = fk_cliente
 WHERE pk_ordem_servico = :pk_ordem_servico
 ";
-// PREPARA A SINTAXE
-$stmt = $conn->prepare($sql);
-// SUBSTITUI A STRING :PK_SERVICO PELA VARIÁVEL $PK_SERVICO
-$stmt->bindParam(':pk_ordem_servico', $pk_ordem_servico);
-// EXECUTA A SINTAXE FINAL NO MYSQL
-$stmt->execute();
-// VERIFICAR SE ENCONTROU ALGUM REGISTRO NO BANCO DE DADOS
-if ($stmt->rowCount() > 0) {
-$dado = $stmt->fetch(PDO::FETCH_OBJ);
-$data_ordem_servico = $dado->data_ordem_servico;
-$data_inicio = $dado->data_inicio;
-$data_fim = $dado->data_fim;
-$cpf = $dado->cpf;
-$nome = $dado->nome;
-} else {
-$_SESSION["tipo"] = 'error';
-$_SESSION["title"] = 'Ops!';
-$_SESSION["msg"] = 'Registro não encontrado.';
-header("Location: ./");
-exit;
-}
+    // PREPARA A SINTAXE
+    $stmt = $conn->prepare($sql);
+    // SUBSTITUI A STRING :PK_SERVICO PELA VARIÁVEL $PK_SERVICO
+    $stmt->bindParam(':pk_ordem_servico', $pk_ordem_servico);
+    // EXECUTA A SINTAXE FINAL NO MYSQL
+    $stmt->execute();
+    // VERIFICAR SE ENCONTROU ALGUM REGISTRO NO BANCO DE DADOS
+    if ($stmt->rowCount() > 0) {
+        $dado = $stmt->fetch(PDO::FETCH_OBJ);
+        $data_ordem_servico = $dado->data_ordem_servico;
+        $data_inicio = $dado->data_inicio;
+        $data_fim = $dado->data_fim;
+        $cpf = $dado->cpf;
+        $nome = $dado->nome;
+    } else {
+        $_SESSION["tipo"] = 'error';
+        $_SESSION["title"] = 'Ops!';
+        $_SESSION["msg"] = 'Registro não encontrado.';
+        header("Location: ./");
+        exit;
+    }
 }
 
 ?>
@@ -129,7 +129,14 @@ exit;
                                             </div>
                                             <div class="col-md-4">
                                                 <label for="cpf" class="form-label">CPF</label>
-                                                <input required type="text" class="form-control" id="cpf" name="cpf" value="<?php echo $cpf; ?>" data-mask="000.000.000-00">
+                                                <div class="input-group">
+                                                    <input required type="text" class="form-control" id="cpf" name="cpf" value="<?php echo $cpf; ?>" data-mask="000.000.000-00">
+                                                    <span class="input-group-append">
+                                                        <button id="btn-search" type="button" class="btn btn-default btn-flat">
+                                                            <i class="bi bi-search"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div class="col-md">
                                                 <label for="nome" class="form-label">Nome</label>
@@ -171,12 +178,12 @@ exit;
                                                             <tbody>
                                                                 <tr>
                                                                     <td>
-                                                                        <select class="form-control">
+                                                                        <select required class="form-control" name="fk_servico[]">
                                                                             <?php echo $options; ?>
                                                                         </select>
                                                                     </td>
                                                                     <td>
-                                                                        <input class="form-control" type="number">
+                                                                        <input required class="form-control" type="number" name="valor[]">
                                                                     </td>
                                                                     <td>
 
@@ -250,7 +257,12 @@ exit;
     <script>
         $(function() {
 
-            $("#cpf").change(function() {
+            $("#cpf").keyup(function() {
+                // LIMPAR INPUT DE NOME
+                $("#nome").val("");
+            })
+
+            $("#btn-search").click(function() {
                 // LIMPAR INPUT DE NOME
                 $("#nome").val("");
                 // FAZ A REQUISIÇÃO PARA O ARQUIVO "CONSULTAR_CPF.PHP"
@@ -264,6 +276,7 @@ exit;
                         } else {
                             alert(data['dado']);
                             $("#cpf").val("")
+                            $("#cpf").focus()
                         }
                     }
                 )
@@ -289,11 +302,11 @@ exit;
                 var newRow = $("<tr>");
                 var cols = "";
                 cols += '<td>';
-                cols += '<select class="form-control" name="">';
+                cols += '<select class="form-control" name="fk_servico[]">';
                 cols += '<?php echo $options; ?>';
                 cols += '</select>';
                 cols += '</td>';
-                cols += '<td><input type="number" class="form-control" name=""></td>';
+                cols += '<td><input type="number" class="form-control" name="valor[]"></td>';
                 cols += '<td>';
                 cols += '<button class="btn btn-danger btn-sm" onclick="RemoveRow(this)" type="button"><i class="fas fa-trash"></i></button>';
                 cols += '</td>';
