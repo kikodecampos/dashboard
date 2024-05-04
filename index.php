@@ -3,6 +3,7 @@ include('./verificar-autenticidade.php');
 include('./conexao-pdo.php');
 
 $pagina_ativa = 'home';
+
 ?>
 
 
@@ -62,7 +63,7 @@ $pagina_ativa = 'home';
               <!-- small box -->
               <div class="small-box bg-info">
                 <div class="inner">
-                  <h3>150</h3>
+                  <h3><?php echo $dados->total_os;?></h3>
 
                   <p>Ordens de Serviço</p>
                 </div>
@@ -77,8 +78,7 @@ $pagina_ativa = 'home';
               <!-- small box -->
               <div class="small-box bg-success">
                 <div class="inner">
-                  <h3>53<sup style="font-size: 20px">%</sup></h3>
-
+                  <h3><?php echo intval($porcentagem_os_concluida);?><sup style="font-size: 20px">%</sup></h3>
                   <p>Ordens Concluidas</p>
                 </div>
                 <div class="icon">
@@ -92,7 +92,7 @@ $pagina_ativa = 'home';
               <!-- small box -->
               <div class="small-box bg-warning">
                 <div class="inner">
-                  <h3>44</h3>
+                  <h3><?php echo $dados->total_clientes;?></h3>
 
                   <p>Clientes</p>
                 </div>
@@ -107,7 +107,7 @@ $pagina_ativa = 'home';
               <!-- small box -->
               <div class="small-box bg-danger">
                 <div class="inner">
-                  <h3>65</h3>
+                  <h3><?php echo $dados->total_servicos;?></h3>
 
                   <p>Serviços</p>
                 </div>

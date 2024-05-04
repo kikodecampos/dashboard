@@ -13,7 +13,7 @@
         <img src="https://github.com/kikodecampos.png" class="img-circle elevation-2" alt="User Image">
       </div>
       <div class="info">
-        <a href="#" class="d-block"><?php echo $_SESSION["nome_usuario"]; ?></a>
+        <a href="<?php echo caminhoURL;?>/meu-perfil/" class="d-block"><?php echo $_SESSION["nome_usuario"]; ?></a>
       </div>
     </div>
 
@@ -36,7 +36,7 @@
             <i class="nav-icon bi bi-cash-coin"></i>
             <p>
               Ordens de Serviço
-              <span class="right badge badge-warning">15</span>
+              <span class="right badge badge-warning"><?php echo $total_os_abertas;?></span>
             </p>
           </a>
         </li>

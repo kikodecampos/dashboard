@@ -1,3 +1,44 @@
+<?php
+
+$sql = "
+SELECT COUNT(pk_ordem_servico) total_os,
+(
+  SELECT COUNT(pk_cliente)
+  FROM clientes
+) total_clientes,
+(
+  SELECT COUNT(pk_servico)
+  FROM servicos
+) total_servicos,
+(
+  SELECT COUNT(pk_ordem_servico)
+  FROM ordens_servicos
+  WHERE data_fim <> '0000-00-00'
+) total_os_fechadas
+FROM ordens_servicos
+";
+
+try {
+  $stmt = $conn->prepare($sql);
+  $stmt->execute();
+
+  $dados = $stmt->fetch(PDO::FETCH_OBJ);
+
+  $total_os_abertas = $dados->total_os - $dados->total_os_fechadas;
+  // VERIFICA SE HÁ O.S. PARA FAZER A DIVISÃO
+  if($dados->total_os > 0) {
+    $porcentagem_os_concluida = $dados->total_os_fechadas / $dados->total_os * 100;
+  } else {
+    $porcentagem_os_concluida = 0;
+  }
+
+} catch (PDOException $ex) {
+  $_SESSION["tipo"] = "error";
+  $_SESSION["title"] = "Ops!";
+  $_SESSION["msg"] = $ex->getMessage();
+}
+?>
+
 <nav id="navTopo" class="main-header navbar navbar-expand navbar-white navbar-light">
   <!-- Left navbar links -->
   <ul class="navbar-nav">
@@ -23,7 +64,7 @@
     <li class="nav-item dropdown">
       <a class="nav-link" data-toggle="dropdown" href="#">
         <i class="far fa-bell"></i>
-        <span class="badge badge-warning navbar-badge">15</span>
+        <span class="badge badge-warning navbar-badge"><?php echo $total_os_abertas;?></span>
       </a>
       <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
         <span class="dropdown-item dropdown-header">15 Notifications</span>
