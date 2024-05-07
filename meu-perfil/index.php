@@ -85,7 +85,7 @@ if ($stmt->rowCount() > 0) {
                                     <div class="card-body">
                                         <div class="row mb-3">
                                             <div class="col-md-2">
-                                                <img class="img-fluid rounded-circle" src="https://github.com/kikodecampos.png" width="300" height="300">
+                                                <img class="img-fluid rounded-circle" src="fotos/<?php echo $foto;?>" width="300" height="300">
                                             </div>
                                             <div class="col-md">
                                                 <div class="row mb-3">
